@@ -1,0 +1,1554 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modther Soliman — Video Editor</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0a0a0f;
+        --surface: #12121a;
+        --card: #17171f;
+        --accent: #e63946;
+        --accent2: #ff6b35;
+        --text: #f0f0f0;
+        --muted: #888899;
+        --border: #252530;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "DM Sans", sans-serif;
+        overflow-x: hidden;
+      }
+
+      /* NOISE TEXTURE OVERLAY */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 1000;
+        opacity: 0.5;
+      }
+
+      /* NAV */
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 999;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 48px;
+        background: rgba(10, 10, 15, 0.85);
+        backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .nav-logo {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 26px;
+        letter-spacing: 3px;
+        color: var(--text);
+        text-decoration: none;
+      }
+
+      .nav-logo span {
+        color: var(--accent);
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 32px;
+        list-style: none;
+      }
+      .nav-links a {
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        transition: color 0.2s;
+      }
+      .nav-links a:hover {
+        color: var(--accent);
+      }
+
+      /* HERO */
+      .hero {
+        min-height: 100vh;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: end;
+        padding: 120px 0 0 48px;
+        gap: 0;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        top: -200px;
+        right: -200px;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(
+          circle,
+          rgba(230, 57, 70, 0.12) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+
+      .hero-text {
+        position: relative;
+        z-index: 2;
+        padding-bottom: 80px;
+      }
+
+      .hero-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(230, 57, 70, 0.1);
+        border: 1px solid rgba(230, 57, 70, 0.3);
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        padding: 6px 14px;
+        border-radius: 20px;
+        margin-bottom: 28px;
+        animation: fadeIn 0.6s ease both;
+      }
+
+      .hero-tag::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        background: var(--accent);
+        border-radius: 50%;
+        animation: pulse 1.5s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.5;
+          transform: scale(1.4);
+        }
+      }
+
+      .hero-name {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(64px, 8vw, 108px);
+        line-height: 0.9;
+        letter-spacing: 2px;
+        margin-bottom: 24px;
+        animation: slideUp 0.7s ease both 0.1s;
+      }
+
+      .hero-name .line2 {
+        color: var(--accent);
+      }
+
+      .hero-bio {
+        font-size: 16px;
+        line-height: 1.8;
+        color: var(--muted);
+        max-width: 480px;
+        margin-bottom: 40px;
+        animation: slideUp 0.7s ease both 0.2s;
+      }
+
+      .hero-bio strong {
+        color: var(--text);
+      }
+
+      .hero-cta {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        animation: slideUp 0.7s ease both 0.3s;
+      }
+
+      .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--accent);
+        color: #fff;
+        text-decoration: none;
+        padding: 14px 28px;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        border-radius: 4px;
+        transition:
+          background 0.2s,
+          transform 0.15s;
+      }
+
+      .btn-primary:hover {
+        background: #c0303b;
+        transform: translateY(-2px);
+      }
+
+      .btn-outline {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: transparent;
+        color: var(--text);
+        text-decoration: none;
+        padding: 13px 28px;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        border: 1.5px solid var(--border);
+        border-radius: 4px;
+        transition:
+          border-color 0.2s,
+          color 0.2s;
+      }
+
+      .btn-outline:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      /* PHOTO */
+      .hero-visual {
+        position: relative;
+        display: flex;
+        justify-content: flex-end;
+        align-items: flex-end;
+        overflow: visible;
+      }
+
+      .photo-cutout {
+        position: relative;
+        height: min(85vh, 680px);
+        width: auto;
+        transform: translateX(120px);
+        opacity: 0;
+        animation: slideInRight 0.9s cubic-bezier(0.22, 0.68, 0, 1.1) 0.35s
+          forwards;
+        filter: drop-shadow(-20px 0 60px rgba(230, 57, 70, 0.18));
+        z-index: 2;
+      }
+
+      .photo-cutout img {
+        height: 100%;
+        width: auto;
+        display: block;
+        object-fit: contain;
+      }
+
+      /* Red glow behind figure */
+      .hero-visual::before {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        right: 60px;
+        width: 300px;
+        height: 500px;
+        background: radial-gradient(
+          ellipse at bottom,
+          rgba(230, 57, 70, 0.15) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      @keyframes slideInRight {
+        from {
+          transform: translateX(120px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      .stats-row {
+        display: flex;
+        gap: 32px;
+        margin-top: 40px;
+        animation: slideUp 0.7s ease both 0.4s;
+      }
+
+      .stat {
+        text-align: left;
+      }
+      .stat-num {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 40px;
+        color: var(--accent);
+        line-height: 1;
+      }
+      .stat-label {
+        font-size: 12px;
+        color: var(--muted);
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(24px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* SECTIONS */
+      section {
+        padding: 100px 48px;
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      .section-header {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 60px;
+      }
+
+      .section-number {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 13px;
+        color: var(--accent);
+        letter-spacing: 3px;
+      }
+
+      .section-title {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 52px;
+        letter-spacing: 2px;
+        line-height: 1;
+      }
+
+      .section-line {
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+
+      /* SKILLS */
+      .skills-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 16px;
+      }
+
+      .skill-item {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 20px 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition:
+          border-color 0.2s,
+          transform 0.2s;
+      }
+
+      .skill-item:hover {
+        border-color: var(--accent);
+        transform: translateY(-3px);
+      }
+
+      .skill-icon {
+        font-size: 22px;
+        width: 36px;
+        text-align: center;
+      }
+
+      .skill-name {
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+
+      /* VIDEOS */
+      .videos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+        gap: 24px;
+      }
+
+      .video-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+        transition:
+          transform 0.3s cubic-bezier(0.22, 0.68, 0, 1.2),
+          border-color 0.25s,
+          box-shadow 0.3s;
+        cursor: pointer;
+      }
+
+      .video-card:hover {
+        transform: translateY(-6px) scale(1.01);
+        border-color: rgba(230, 57, 70, 0.5);
+        box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+      }
+
+      .latest-card {
+        border-color: rgba(230, 57, 70, 0.25);
+      }
+
+      .video-wrapper {
+        position: relative;
+        width: 100%;
+        padding-bottom: 56.25%; /* 16:9 aspect ratio */
+        background: #0d0d12;
+        overflow: hidden;
+      }
+
+      .video-wrapper img,
+      .video-iframe,
+      .video-player {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+      }
+
+      /* Open in tab button */
+      .video-open-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(230, 57, 70, 0.9);
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        cursor: pointer;
+        z-index: 15;
+        transition:
+          background 0.2s,
+          transform 0.15s;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .video-open-btn:hover {
+        background: rgba(200, 30, 50, 1);
+        transform: scale(1.05);
+      }
+
+      .video-open-btn:focus {
+        outline: 2px solid rgba(230, 57, 70, 1);
+        outline-offset: 2px;
+      }
+
+      .video-open-btn:active {
+        transform: scale(0.98);
+      }
+
+      @media (max-width: 600px) {
+        .video-open-btn {
+          padding: 6px 10px;
+          font-size: 11px;
+          top: 8px;
+          right: 8px;
+        }
+      }
+
+      .video-iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+      }
+
+      .video-player {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      /* OVERLAY — shown when video not playing */
+      .video-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.35s ease;
+      }
+
+      .overlay-gradient {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to top,
+          rgba(10, 10, 15, 0.75) 0%,
+          rgba(10, 10, 15, 0.2) 50%,
+          rgba(10, 10, 15, 0.4) 100%
+        );
+      }
+
+      .play-btn {
+        position: relative;
+        z-index: 2;
+        width: 64px;
+        height: 64px;
+        transition:
+          transform 0.25s cubic-bezier(0.22, 0.68, 0, 1.4),
+          opacity 0.2s;
+        filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.6));
+      }
+
+      .play-btn svg {
+        width: 100%;
+        height: 100%;
+      }
+
+      .video-card:hover .play-btn {
+        transform: scale(1.15);
+      }
+
+      /* When active (playing), hide overlay */
+      .video-card.playing .video-overlay,
+      .video-overlay {
+        display: none;
+      }
+
+      .video-label {
+        display: none;
+      }
+
+      .video-thumb {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      /* ABOUT */
+      .about-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 48px;
+        align-items: start;
+      }
+
+      .about-text p {
+        font-size: 16px;
+        line-height: 1.85;
+        color: var(--muted);
+        margin-bottom: 20px;
+      }
+
+      .about-text p strong {
+        color: var(--text);
+      }
+
+      .about-xp {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .xp-item {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        border-radius: 0 8px 8px 0;
+        padding: 20px 24px;
+      }
+
+      .xp-org {
+        font-size: 13px;
+        color: var(--accent);
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+      }
+
+      .xp-role {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 2px;
+      }
+
+      .xp-period {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      /* CONTACT */
+      .contact-wrapper {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 64px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 60px;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .contact-wrapper::before {
+        content: "";
+        position: absolute;
+        bottom: -100px;
+        right: -100px;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(
+          circle,
+          rgba(230, 57, 70, 0.07) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+
+      .contact-heading {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 64px;
+        line-height: 0.95;
+        letter-spacing: 2px;
+      }
+
+      .contact-heading span {
+        color: var(--accent);
+      }
+
+      .contact-sub {
+        margin-top: 16px;
+        font-size: 15px;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .contact-links {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .contact-link {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 18px 24px;
+        text-decoration: none;
+        color: var(--text);
+        transition:
+          border-color 0.2s,
+          transform 0.2s;
+      }
+
+      .contact-link:hover {
+        border-color: var(--accent);
+        transform: translateX(4px);
+      }
+
+      .contact-link-icon {
+        font-size: 20px;
+        width: 32px;
+        text-align: center;
+      }
+
+      .contact-link-info {
+        flex: 1;
+      }
+      .contact-link-type {
+        font-size: 11px;
+        color: var(--muted);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 2px;
+      }
+      .contact-link-value {
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .contact-link-arrow {
+        color: var(--muted);
+        font-size: 16px;
+      }
+
+      /* FOOTER */
+      footer {
+        border-top: 1px solid var(--border);
+        padding: 32px 48px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      footer p {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .footer-logo {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 22px;
+        letter-spacing: 3px;
+        color: var(--muted);
+      }
+
+      .footer-logo span {
+        color: var(--accent);
+      }
+
+      /* RESPONSIVE */
+      @media (max-width: 900px) {
+        nav {
+          padding: 16px 24px;
+        }
+        .nav-links {
+          gap: 20px;
+        }
+        .hero {
+          grid-template-columns: 1fr;
+          padding: 100px 24px 60px;
+        }
+        .hero-visual {
+          display: none;
+        }
+        section {
+          padding: 60px 24px;
+        }
+        .about-grid {
+          grid-template-columns: 1fr;
+        }
+        .contact-wrapper {
+          grid-template-columns: 1fr;
+          padding: 40px 24px;
+        }
+        .videos-grid {
+          grid-template-columns: 1fr;
+        }
+        footer {
+          flex-direction: column;
+          gap: 16px;
+          text-align: center;
+        }
+      }
+
+      /* DIVIDER LINE */
+      .full-divider {
+        height: 1px;
+        background: var(--border);
+        margin: 0 48px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- NAV -->
+    <nav>
+      <a class="nav-logo" href="#"><span>M</span>ODTHER</a>
+      <ul class="nav-links">
+        <li><a href="#latest">Portfolio</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-text">
+        <div class="hero-tag">Available for Freelance</div>
+        <h1 class="hero-name">
+          MODTHER<br />
+          <span class="line2">SOLIMAN</span>
+        </h1>
+        <p class="hero-bio">
+          <strong>Freelance Video Editor</strong> based in Cairo, Egypt.<br />
+          I tell stories through cuts, color, and rhythm — from humanitarian
+          documentaries to corporate campaigns. 4+ years of experience across
+          agencies, cultural events, and volunteer organizations.
+        </p>
+        <div class="hero-cta">
+          <a href="#latest" class="btn-primary">↓ Watch My Work</a>
+          <a href="#contact" class="btn-outline">Let's Work Together</a>
+        </div>
+        <div class="stats-row">
+          <div class="stat">
+            <div class="stat-num">4+</div>
+            <div class="stat-label">Years Experience</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">16+</div>
+            <div class="stat-label">Projects</div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="photo-cutout">
+          <img src="photo1.png" />
+        </div>
+      </div>
+    </div>
+
+    <div class="full-divider"></div>
+
+    <!-- SKILLS -->
+    <section>
+      <div class="section-header">
+        <span class="section-number">01 /</span>
+        <h2 class="section-title">TOOLS & SKILLS</h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="skills-grid">
+        <div class="skill-item">
+          <span class="skill-icon">🎞</span
+          ><span class="skill-name">Premiere Pro</span>
+        </div>
+        <div class="skill-item">
+          <span class="skill-icon">✨</span
+          ><span class="skill-name">After Effects</span>
+        </div>
+        <div class="skill-item">
+          <span class="skill-icon">📱</span
+          ><span class="skill-name">CapCut</span>
+        </div>
+        <div class="skill-item">
+          <span class="skill-icon">🤖</span
+          ><span class="skill-name">AI Tools</span>
+        </div>
+        <div class="skill-item">
+          <span class="skill-icon">🧠</span
+          ><span class="skill-name">Creative Direction</span>
+        </div>
+        <div class="skill-item">
+          <span class="skill-icon">🎬</span
+          ><span class="skill-name">Storytelling</span>
+        </div>
+        <div class="skill-item">
+          <span class="skill-icon">⚡</span
+          ><span class="skill-name">Fast Turnaround</span>
+        </div>
+        <div class="skill-item">
+          <span class="skill-icon">🤝</span
+          ><span class="skill-name">Team Collaboration</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="full-divider"></div>
+
+    <!-- LATEST VIDEOS -->
+    <section id="latest">
+      <div class="section-header">
+        <span class="section-number">02 /</span>
+        <h2 class="section-title">LATEST WORK</h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="videos-grid">
+        <div
+          class="video-card latest-card"
+          data-id="1NLqPxsimpTywPRyPAaWbcfsp5SolV7LI"
+        >
+          <div class="video-wrapper">
+            <div class="video-overlay">
+              <div class="play-btn">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="12" cy="12" r="12" fill="rgba(230,57,70,0.92)" />
+                  <polygon points="10,8 17,12 10,16" fill="white" />
+                </svg>
+              </div>
+              <div class="overlay-gradient"></div>
+            </div>
+            <iframe
+              data-src="https://drive.google.com/file/d/1NLqPxsimpTywPRyPAaWbcfsp5SolV7LI/preview"
+              src=""
+              allow="autoplay; fullscreen"
+              allowfullscreen
+              loading="lazy"
+              class="video-iframe"
+            ></iframe>
+          </div>
+        </div>
+        <div
+          class="video-card latest-card"
+          data-id="1FOGBRbajx7vBXbiHGHoDn5KMygzqhqRn"
+        >
+          <div class="video-wrapper">
+            <div class="video-overlay">
+              <div class="play-btn">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="12" cy="12" r="12" fill="rgba(230,57,70,0.92)" />
+                  <polygon points="10,8 17,12 10,16" fill="white" />
+                </svg>
+              </div>
+              <div class="overlay-gradient"></div>
+            </div>
+            <iframe
+              data-src="https://drive.google.com/file/d/1FOGBRbajx7vBXbiHGHoDn5KMygzqhqRn/preview"
+              src=""
+              allow="autoplay; fullscreen"
+              allowfullscreen
+              loading="lazy"
+              class="video-iframe"
+            ></iframe>
+          </div>
+        </div>
+        <div
+          class="video-card latest-card"
+          data-id="1-o5mk_dOP8VtIefEPqz894bJ060UwO-p"
+        >
+          <div class="video-wrapper">
+            <div class="video-overlay">
+              <div class="play-btn">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="12" cy="12" r="12" fill="rgba(230,57,70,0.92)" />
+                  <polygon points="10,8 17,12 10,16" fill="white" />
+                </svg>
+              </div>
+              <div class="overlay-gradient"></div>
+            </div>
+            <iframe
+              data-src="https://drive.google.com/file/d/1-o5mk_dOP8VtIefEPqz894bJ060UwO-p/preview"
+              src=""
+              allow="autoplay; fullscreen"
+              allowfullscreen
+              loading="lazy"
+              class="video-iframe"
+            ></iframe>
+          </div>
+        </div>
+        <div
+          class="video-card latest-card"
+          data-id="1Ll-kpIimc5Q9bqb8Io8EMU0tC--u-NTj"
+        >
+          <div class="video-wrapper">
+            <div class="video-overlay">
+              <div class="play-btn">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="12" cy="12" r="12" fill="rgba(230,57,70,0.92)" />
+                  <polygon points="10,8 17,12 10,16" fill="white" />
+                </svg>
+              </div>
+              <div class="overlay-gradient"></div>
+            </div>
+            <iframe
+              data-src="https://drive.google.com/file/d/1Ll-kpIimc5Q9bqb8Io8EMU0tC--u-NTj/preview"
+              src=""
+              allow="autoplay; fullscreen"
+              allowfullscreen
+              loading="lazy"
+              class="video-iframe"
+            ></iframe>
+          </div>
+        </div>
+        <div
+          class="video-card latest-card"
+          data-id="1hNxM6Uty1Ey8T43TZ74qFq-xogaTlVxN"
+        >
+          <div class="video-wrapper">
+            <div class="video-overlay">
+              <div class="play-btn">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="12" cy="12" r="12" fill="rgba(230,57,70,0.92)" />
+                  <polygon points="10,8 17,12 10,16" fill="white" />
+                </svg>
+              </div>
+              <div class="overlay-gradient"></div>
+            </div>
+            <iframe
+              data-src="https://drive.google.com/file/d/1hNxM6Uty1Ey8T43TZ74qFq-xogaTlVxN/preview"
+              src=""
+              allow="autoplay; fullscreen"
+              allowfullscreen
+              loading="lazy"
+              class="video-iframe"
+            ></iframe>
+          </div>
+        </div>
+        <div
+          class="video-card latest-card"
+          data-id="1dPzhORG4k0pTY3JcoEk8MmNEy24S1Q3V"
+        >
+          <div class="video-wrapper">
+            <div class="video-overlay">
+              <div class="play-btn">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="12" cy="12" r="12" fill="rgba(230,57,70,0.92)" />
+                  <polygon points="10,8 17,12 10,16" fill="white" />
+                </svg>
+              </div>
+              <div class="overlay-gradient"></div>
+            </div>
+            <iframe
+              data-src="https://drive.google.com/file/d/1dPzhORG4k0pTY3JcoEk8MmNEy24S1Q3V/preview"
+              src=""
+              allow="autoplay; fullscreen"
+              allowfullscreen
+              loading="lazy"
+              class="video-iframe"
+            ></iframe>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="full-divider"></div>
+
+    <!-- MORE VIDEOS -->
+    <section id="more">
+      <div class="section-header">
+        <span class="section-number">03 /</span>
+        <h2 class="section-title">MORE PROJECTS</h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="videos-grid">
+        <div class="video-card" data-id="11gPRIDYhkRSas5-mV2x0aN0KoV9YZ8FJ">
+          <div class="video-wrapper">
+            <div class="video-overlay">
+              <div class="play-btn">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="12" cy="12" r="12" fill="rgba(230,57,70,0.92)" />
+                  <polygon points="10,8 17,12 10,16" fill="white" />
+                </svg>
+              </div>
+              <div class="overlay-gradient"></div>
+            </div>
+            <iframe
+              data-src="https://drive.google.com/file/d/11gPRIDYhkRSas5-mV2x0aN0KoV9YZ8FJ/preview"
+              src=""
+              allow="autoplay; fullscreen"
+              allowfullscreen
+              loading="lazy"
+              class="video-iframe"
+            ></iframe>
+          </div>
+        </div>
+        <div class="video-card" data-id="1W_msLElxYOe-OEzKzCZ_W8pw7d4XPfMx">
+          <div class="video-wrapper">
+            <div class="video-overlay">
+              <div class="play-btn">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="12" cy="12" r="12" fill="rgba(230,57,70,0.92)" />
+                  <polygon points="10,8 17,12 10,16" fill="white" />
+                </svg>
+              </div>
+              <div class="overlay-gradient"></div>
+            </div>
+            <iframe
+              data-src="https://drive.google.com/file/d/1W_msLElxYOe-OEzKzCZ_W8pw7d4XPfMx/preview"
+              src=""
+              allow="autoplay; fullscreen"
+              allowfullscreen
+              loading="lazy"
+              class="video-iframe"
+            ></iframe>
+          </div>
+        </div>
+        <div class="video-card" data-id="1KiXLrGYrz9NVM0bU2Y0f0On4BLqSBtx5">
+          <div class="video-wrapper">
+            <div class="video-overlay">
+              <div class="play-btn">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="12" cy="12" r="12" fill="rgba(230,57,70,0.92)" />
+                  <polygon points="10,8 17,12 10,16" fill="white" />
+                </svg>
+              </div>
+              <div class="overlay-gradient"></div>
+            </div>
+            <iframe
+              data-src="https://drive.google.com/file/d/1KiXLrGYrz9NVM0bU2Y0f0On4BLqSBtx5/preview"
+              src=""
+              allow="autoplay; fullscreen"
+              allowfullscreen
+              loading="lazy"
+              class="video-iframe"
+            ></iframe>
+          </div>
+        </div>
+        <div class="video-card" data-id="1Jk5ANhk2_h6l9aK1DebQbC6XJOJngKf_">
+          <div class="video-wrapper">
+            <div class="video-overlay">
+              <div class="play-btn">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="12" cy="12" r="12" fill="rgba(230,57,70,0.92)" />
+                  <polygon points="10,8 17,12 10,16" fill="white" />
+                </svg>
+              </div>
+              <div class="overlay-gradient"></div>
+            </div>
+            <iframe
+              data-src="https://drive.google.com/file/d/1Jk5ANhk2_h6l9aK1DebQbC6XJOJngKf_/preview"
+              src=""
+              allow="autoplay; fullscreen"
+              allowfullscreen
+              loading="lazy"
+              class="video-iframe"
+            ></iframe>
+          </div>
+        </div>
+        <div class="video-card" data-id="1aRDNC8ym-AkfGcKPMmQwLY0yh0GNZD-D">
+          <div class="video-wrapper">
+            <div class="video-overlay">
+              <div class="play-btn">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="12" cy="12" r="12" fill="rgba(230,57,70,0.92)" />
+                  <polygon points="10,8 17,12 10,16" fill="white" />
+                </svg>
+              </div>
+              <div class="overlay-gradient"></div>
+            </div>
+            <iframe
+              data-src="https://drive.google.com/file/d/1aRDNC8ym-AkfGcKPMmQwLY0yh0GNZD-D/preview"
+              src=""
+              allow="autoplay; fullscreen"
+              allowfullscreen
+              loading="lazy"
+              class="video-iframe"
+            ></iframe>
+          </div>
+        </div>
+        <div class="video-card" data-id="1NnmJqLZk6IuOA_AesN_x8uoswNZ2Eewz">
+          <div class="video-wrapper">
+            <div class="video-overlay">
+              <div class="play-btn">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="12" cy="12" r="12" fill="rgba(230,57,70,0.92)" />
+                  <polygon points="10,8 17,12 10,16" fill="white" />
+                </svg>
+              </div>
+              <div class="overlay-gradient"></div>
+            </div>
+            <iframe
+              data-src="https://drive.google.com/file/d/1NnmJqLZk6IuOA_AesN_x8uoswNZ2Eewz/preview"
+              src=""
+              allow="autoplay; fullscreen"
+              allowfullscreen
+              loading="lazy"
+              class="video-iframe"
+            ></iframe>
+          </div>
+        </div>
+        <div class="video-card" data-id="17SFn07mOmUbmhYJKT8u5OmlxVn26GySH">
+          <div class="video-wrapper">
+            <div class="video-overlay">
+              <div class="play-btn">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="12" cy="12" r="12" fill="rgba(230,57,70,0.92)" />
+                  <polygon points="10,8 17,12 10,16" fill="white" />
+                </svg>
+              </div>
+              <div class="overlay-gradient"></div>
+            </div>
+            <iframe
+              data-src="https://drive.google.com/file/d/17SFn07mOmUbmhYJKT8u5OmlxVn26GySH/preview"
+              src=""
+              allow="autoplay; fullscreen"
+              allowfullscreen
+              loading="lazy"
+              class="video-iframe"
+            ></iframe>
+          </div>
+        </div>
+        <div class="video-card" data-id="10N6dZAr4VF9sflOMHOLQanKDALu1hBQo">
+          <div class="video-wrapper">
+            <div class="video-overlay">
+              <div class="play-btn">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="12" cy="12" r="12" fill="rgba(230,57,70,0.92)" />
+                  <polygon points="10,8 17,12 10,16" fill="white" />
+                </svg>
+              </div>
+              <div class="overlay-gradient"></div>
+            </div>
+            <iframe
+              data-src="https://drive.google.com/file/d/10N6dZAr4VF9sflOMHOLQanKDALu1hBQo/preview"
+              src=""
+              allow="autoplay; fullscreen"
+              allowfullscreen
+              loading="lazy"
+              class="video-iframe"
+            ></iframe>
+          </div>
+        </div>
+        <div class="video-card" data-id="1CQv3oP2tciHL1raoII9L7iVmTfyPycwp">
+          <div class="video-wrapper">
+            <div class="video-overlay">
+              <div class="play-btn">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="12" cy="12" r="12" fill="rgba(230,57,70,0.92)" />
+                  <polygon points="10,8 17,12 10,16" fill="white" />
+                </svg>
+              </div>
+              <div class="overlay-gradient"></div>
+            </div>
+            <iframe
+              data-src="https://drive.google.com/file/d/1CQv3oP2tciHL1raoII9L7iVmTfyPycwp/preview"
+              src=""
+              allow="autoplay; fullscreen"
+              allowfullscreen
+              loading="lazy"
+              class="video-iframe"
+            ></iframe>
+          </div>
+        </div>
+        <div class="video-card" data-id="1EXMJqvFkpijk6KaOXOl3T3FnNFOgHD-z">
+          <div class="video-wrapper">
+            <div class="video-overlay">
+              <div class="play-btn">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="12" cy="12" r="12" fill="rgba(230,57,70,0.92)" />
+                  <polygon points="10,8 17,12 10,16" fill="white" />
+                </svg>
+              </div>
+              <div class="overlay-gradient"></div>
+            </div>
+            <iframe
+              data-src="https://drive.google.com/file/d/1EXMJqvFkpijk6KaOXOl3T3FnNFOgHD-z/preview"
+              src=""
+              allow="autoplay; fullscreen"
+              allowfullscreen
+              loading="lazy"
+              class="video-iframe"
+            ></iframe>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="full-divider"></div>
+
+    <!-- ABOUT -->
+    <section id="about">
+      <div class="section-header">
+        <span class="section-number">04 /</span>
+        <h2 class="section-title">ABOUT ME</h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="about-grid">
+        <div class="about-text">
+          <p>
+            My name is <strong>Modther Soliman Hassan</strong>. I'm a Computer
+            Science student at Cairo University — but I've never waited for
+            graduation to start building.
+          </p>
+          <p>
+            What drives me most is projects that have a
+            <strong>distinct artistic and directorial identity</strong> — videos
+            that don't just deliver information, but leave a feeling. I'm drawn
+            to work that challenges the way a story is told: the pacing, the
+            mood, the moment a cut hits just right.
+          </p>
+          <p>
+            Video editing is a genuine passion for me — not just a skill. Even
+            as I build my path in cybersecurity, this craft stays with me
+            because <strong>I love it</strong>, not because I have to. That
+            passion shows in every project I take on.
+          </p>
+          <p>
+            I started volunteering at CIBF 54 unsure if my skills were good
+            enough. Four years later, I was
+            <strong>leading an entire video editors team</strong> as Media
+            Leader at CIBF 57. I completed the
+            <strong>McKinsey Forward Program</strong> — because even my soft
+            skills aren't left to chance.
+          </p>
+        </div>
+        <div class="about-xp">
+          <div class="xp-item">
+            <div class="xp-org">Marketing Agency</div>
+            <div class="xp-role">Video Editor</div>
+            <div class="xp-period">2024 – 2025 · Full-time + Part-time</div>
+          </div>
+          <div class="xp-item">
+            <div class="xp-org">Entreprenelle</div>
+            <div class="xp-role">Video Editing Intern</div>
+            <div class="xp-period">2023 – 2024</div>
+          </div>
+          <div class="xp-item">
+            <div class="xp-org">Egyptian Red Crescent</div>
+            <div class="xp-role">Video Editor · Volunteer</div>
+            <div class="xp-period">2024 – Present</div>
+          </div>
+          <div class="xp-item">
+            <div class="xp-org">CIBF 57</div>
+            <div class="xp-role">Media Leader — Video Editors Team</div>
+            <div class="xp-period">January 2025</div>
+          </div>
+          <div class="xp-item">
+            <div class="xp-org">CIBF 54 → 56</div>
+            <div class="xp-role">Video Editor & Event Organizer</div>
+            <div class="xp-period">2023 – 2024</div>
+          </div>
+          <div class="xp-item">
+            <div class="xp-org">Ministry of Youth & Sports</div>
+            <div class="xp-role">Media Volunteer</div>
+            <div class="xp-period">Official Appreciation Certificate</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="full-divider"></div>
+
+    <!-- CONTACT -->
+    <section id="contact">
+      <div class="contact-wrapper">
+        <div>
+          <h2 class="contact-heading">
+            LET'S<br />CREATE<br /><span>TOGETHER</span>
+          </h2>
+          <p class="contact-sub">
+            Available for freelance projects and collaborations, Reach out and
+            let's make something great.
+          </p>
+        </div>
+        <div class="contact-links">
+          <a href="tel:+201030358425" class="contact-link">
+            <span class="contact-link-icon">📞</span>
+            <div class="contact-link-info">
+              <div class="contact-link-type">Phone</div>
+              <div class="contact-link-value">+20 10 3035 8425</div>
+            </div>
+            <span class="contact-link-arrow">→</span>
+          </a>
+          <a href="mailto:Modther.soliman26@gmail.com" class="contact-link">
+            <span class="contact-link-icon">✉️</span>
+            <div class="contact-link-info">
+              <div class="contact-link-type">Email</div>
+              <div class="contact-link-value">Modther.soliman26@gmail.com</div>
+            </div>
+            <span class="contact-link-arrow">→</span>
+          </a>
+          <a
+            href="https://www.linkedin.com/in/modther-soliman-b51347382"
+            target="_blank"
+            class="contact-link"
+          >
+            <span class="contact-link-icon">💼</span>
+            <div class="contact-link-info">
+              <div class="contact-link-type">LinkedIn</div>
+              <div class="contact-link-value">Modther Soliman</div>
+            </div>
+            <span class="contact-link-arrow">→</span>
+          </a>
+          <a href="https://instagram.com" target="_blank" class="contact-link">
+            <span class="contact-link-icon">📸</span>
+            <div class="contact-link-info">
+              <div class="contact-link-type">Instagram</div>
+              <div class="contact-link-value">@Modther15</div>
+            </div>
+            <span class="contact-link-arrow">→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <p>© 2025 Modther Soliman. All rights reserved.</p>
+      <div class="footer-logo"><span>M</span>ODTHER</div>
+      <p>Cairo, Egypt 🇪🇬</p>
+    </footer>
+<script>
+      document.querySelectorAll(".video-card").forEach((card) => {
+        const wrapper = card.querySelector(".video-wrapper");
+        const driveId = card.dataset.id;
+        const previewUrl = `https://drive.google.com/file/d/${driveId}/preview`;
+        const thumbnailUrl = `https://drive.google.com/thumbnail?id=${driveId}&sz=w1280`;
+
+        wrapper.innerHTML = `
+          <img 
+            src="${thumbnailUrl}" 
+            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;"
+            loading="lazy"
+          />
+          <button class="video-open-btn" style="position: absolute; top: 10px; right: 10px; z-index: 20;" data-drive-id="${driveId}">
+            ⎙ Open
+          </button>
+          <div class="video-overlay" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 10;">
+            <div class="play-btn" style="position: relative; z-index: 15; width: 64px; height: 64px;">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%; filter: drop-shadow(0 4px 16px rgba(0,0,0,0.6));">
+                <circle cx="12" cy="12" r="12" fill="rgba(230,57,70,0.92)" />
+                <polygon points="10,8 17,12 10,16" fill="white" />
+              </svg>
+            </div>
+            <div class="overlay-gradient" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,10,15,0.75) 0%, transparent 50%); z-index: 5;"></div>
+          </div>
+        `;
+
+        const openBtn = wrapper.querySelector(".video-open-btn");
+        openBtn.addEventListener("click", (e) => {
+          e.stopPropagation(); 
+          window.open(previewUrl, "_blank");
+        });
+
+        card.addEventListener("click", (e) => {
+          if (e.target.closest(".video-open-btn")) return;
+          
+          // THE FIX: Add 55px to account for the Google Drive control bar
+          wrapper.style.paddingBottom = "calc(56.25% + 55px)"; 
+          
+          wrapper.innerHTML = `
+            <iframe 
+              src="${previewUrl}" 
+              style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 30;"
+              allow="autoplay; fullscreen" 
+              allowfullscreen>
+            </iframe>
+          `;
+        });
+      });
+    </script>
+
+          }
+        });
+
+        // Hover effect on card
+        card.addEventListener("mouseenter", () => {
+          const playBtn = card.querySelector(".play-btn");
+          if (playBtn) {
+            playBtn.style.transform = "scale(1.15)";
+          }
+        });
+
+        card.addEventListener("mouseleave", () => {
+          const playBtn = card.querySelector(".play-btn");
+          if (playBtn) {
+            playBtn.style.transform = "scale(1)";
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
