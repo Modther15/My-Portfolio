@@ -447,8 +447,69 @@
 
       .video-wrapper {
         position: relative;
-        padding-top: 66%; /* taller to give controls breathing room */
+        width: 100%;
+        padding-bottom: 56.25%; /* 16:9 aspect ratio */
         background: #0d0d12;
+        overflow: hidden;
+      }
+
+      .video-wrapper img,
+      .video-iframe,
+      .video-player {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+      }
+
+      /* Open in tab button */
+      .video-open-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(230, 57, 70, 0.9);
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        cursor: pointer;
+        z-index: 15;
+        transition:
+          background 0.2s,
+          transform 0.15s;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .video-open-btn:hover {
+        background: rgba(200, 30, 50, 1);
+        transform: scale(1.05);
+      }
+
+      .video-open-btn:focus {
+        outline: 2px solid rgba(230, 57, 70, 1);
+        outline-offset: 2px;
+      }
+
+      .video-open-btn:active {
+        transform: scale(0.98);
+      }
+
+      @media (max-width: 600px) {
+        .video-open-btn {
+          padding: 6px 10px;
+          font-size: 11px;
+          top: 8px;
+          right: 8px;
+        }
       }
 
       .video-iframe {
@@ -458,6 +519,12 @@
         width: 100%;
         height: 100%;
         border: none;
+        display: block;
+      }
+
+      .video-player {
+        width: 100%;
+        height: 100%;
         display: block;
       }
 
@@ -504,13 +571,20 @@
       }
 
       /* When active (playing), hide overlay */
-      .video-card.playing .video-overlay {
-        opacity: 0;
-        pointer-events: none;
+      .video-card.playing .video-overlay,
+      .video-overlay {
+        display: none;
       }
 
       .video-label {
         display: none;
+      }
+
+      .video-thumb {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
       }
 
       /* ABOUT */
@@ -1406,41 +1480,72 @@
       <div class="footer-logo"><span>M</span>ODTHER</div>
       <p>Cairo, Egypt 🇪🇬</p>
     </footer>
-
-    <script>
-      // Click-to-play + auto-pause others
+<script>
       document.querySelectorAll(".video-card").forEach((card) => {
-        const overlay = card.querySelector(".video-overlay");
-        const iframe = card.querySelector(".video-iframe");
-        const src = iframe.getAttribute("data-src");
+        const wrapper = card.querySelector(".video-wrapper");
+        const driveId = card.dataset.id;
+        const previewUrl = `https://drive.google.com/file/d/${driveId}/preview`;
+        const thumbnailUrl = `https://drive.google.com/thumbnail?id=${driveId}&sz=w1280`;
 
-        // Load iframe src on first click only (lazy)
-        card.addEventListener("click", () => {
-          // Pause all other playing cards
-          document.querySelectorAll(".video-card.playing").forEach((other) => {
-            if (other === card) return;
-            const otherIframe = other.querySelector(".video-iframe");
-            // Reload with blank src pauses Drive video
-            otherIframe.src = "";
-            setTimeout(() => {
-              otherIframe.src = otherIframe.getAttribute("data-src");
-            }, 50);
-            other.classList.remove("playing");
-          });
+        wrapper.innerHTML = `
+          <img 
+            src="${thumbnailUrl}" 
+            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;"
+            loading="lazy"
+          />
+          <button class="video-open-btn" style="position: absolute; top: 10px; right: 10px; z-index: 20;" data-drive-id="${driveId}">
+            ⎙ Open
+          </button>
+          <div class="video-overlay" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 10;">
+            <div class="play-btn" style="position: relative; z-index: 15; width: 64px; height: 64px;">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%; filter: drop-shadow(0 4px 16px rgba(0,0,0,0.6));">
+                <circle cx="12" cy="12" r="12" fill="rgba(230,57,70,0.92)" />
+                <polygon points="10,8 17,12 10,16" fill="white" />
+              </svg>
+            </div>
+            <div class="overlay-gradient" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,10,15,0.75) 0%, transparent 50%); z-index: 5;"></div>
+          </div>
+        `;
 
-          if (card.classList.contains("playing")) {
-            // Toggle off
-            iframe.src = "";
-            setTimeout(() => {
-              iframe.src = src;
-            }, 50);
-            card.classList.remove("playing");
-          } else {
-            // Start playing
-            if (!iframe.src || iframe.src === window.location.href) {
-              iframe.src = src;
-            }
-            card.classList.add("playing");
+        const openBtn = wrapper.querySelector(".video-open-btn");
+        openBtn.addEventListener("click", (e) => {
+          e.stopPropagation(); 
+          window.open(previewUrl, "_blank");
+        });
+
+        card.addEventListener("click", (e) => {
+          if (e.target.closest(".video-open-btn")) return;
+          
+          // THE FIX: Add 55px to account for the Google Drive control bar
+          wrapper.style.paddingBottom = "calc(56.25% + 55px)"; 
+          
+          wrapper.innerHTML = `
+            <iframe 
+              src="${previewUrl}" 
+              style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 30;"
+              allow="autoplay; fullscreen" 
+              allowfullscreen>
+            </iframe>
+          `;
+        });
+      });
+    </script>
+
+          }
+        });
+
+        // Hover effect on card
+        card.addEventListener("mouseenter", () => {
+          const playBtn = card.querySelector(".play-btn");
+          if (playBtn) {
+            playBtn.style.transform = "scale(1.15)";
+          }
+        });
+
+        card.addEventListener("mouseleave", () => {
+          const playBtn = card.querySelector(".play-btn");
+          if (playBtn) {
+            playBtn.style.transform = "scale(1)";
           }
         });
       });
